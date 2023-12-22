@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Test</title>
+    <script src="https://cdn.socket.io/4.4.0/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Chat Test</h1>
+    <input type="text" id="messageInput" placeholder="Enter message">
+    <button id="sendMessage">Send Message</button>
+    <button id="joinChat">Join Chat</button>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+        var socket = io('http://localhost:3000'); 
+
+        document.getElementById('sendMessage').addEventListener('click', () =>{
+            var messageInput = document.getElementById('messageInput');
+            var messageContent = messageInput.value;
+            socket.emit('message', { senderId: 'sender1', receiverId: 'receiver1', content: messageContent });
+            messageInput.value = '';
+        });
+
+        document.getElementById('joinChat').addEventListener('click', () =>{
+            socket.emit('joinChat', { senderId: 'sender1', receiverId: 'receiver1' });
+        });
+
+        socket.on('message', (message) =>{
+            console.log('Received message:', message);
+        });
+
+        socket.on('chats', (chats) =>{
+            console.log('Received chats:', chats);
+        });
+    });
+    </script>
+</body>
+</html>
