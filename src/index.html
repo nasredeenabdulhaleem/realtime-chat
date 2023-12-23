@@ -2,36 +2,77 @@
 <html>
 <head>
     <title>Chat Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #messageInput {
+            width: 300px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        #sendMessage, #joinChat {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+    </style>
     <script src="https://cdn.socket.io/4.4.0/socket.io.min.js"></script>
 </head>
 <body>
     <h1>Chat Test</h1>
+    <form>
     <input type="text" id="messageInput" placeholder="Enter message">
-    <button id="sendMessage">Send Message</button>
+    <button id="sendMessage">Send Message</button></form>
     <button id="joinChat">Join Chat</button>
+    <ul></ul>
+    <script src="https://cdn.socket.io/4.4.0/socket.io.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-        var socket = io('http://localhost:3000'); 
+        const socket = io('ws://localhost:3000')
 
-        document.getElementById('sendMessage').addEventListener('click', () =>{
-            var messageInput = document.getElementById('messageInput');
-            var messageContent = messageInput.value;
-            socket.emit('message', { senderId: 'sender1', receiverId: 'receiver1', content: messageContent });
-            messageInput.value = '';
-        });
+        function sendMessage(e) {
+            e.preventDefault()
+            const input = document.querySelector('input')
+            if (input.value) {
+                socket.emit('message', input.value)
+                console.log(input.value)
+                input.value = ""
+            }
+            input.focus()
+        }
 
-        document.getElementById('joinChat').addEventListener('click', () =>{
-            socket.emit('joinChat', { senderId: 'sender1', receiverId: 'receiver1' });
-        });
+        document.querySelector('form')
+            .addEventListener('submit', sendMessage)
 
-        socket.on('message', (message) =>{
-            console.log('Received message:', message);
-        });
-
-        socket.on('chats', (chats) =>{
-            console.log('Received chats:', chats);
-        });
-    });
+        // Listen for messages 
+        socket.on("message", ({ data }) => {
+            const li = document.createElement('li')
+            li.textContent = data
+            document.querySelector('ul').appendChild(li)
+        })
     </script>
 </body>
 </html>

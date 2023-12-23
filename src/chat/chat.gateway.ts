@@ -3,9 +3,12 @@ import {
   WebSocketGateway,
   OnGatewayInit,
   WebSocketServer,
+  MessageBody,
+  ConnectedSocket,
 } from "@nestjs/websockets";
 import { Server } from "socket.io";
 import { ChatService } from "./chat.service";
+import { Socket } from "socket.io";
 // import { wsAuthMiddleware } from './ws-auth.middleware';
 
 // const SECRET = 'secret-key';
@@ -15,8 +18,8 @@ import { ChatService } from "./chat.service";
   cors: { origin: "http://127.0.0.1:5500", credentials: true },
 })
 export class ChatGateway implements OnGatewayInit {
-  @WebSocketServer()
-  server!: Server;
+  // @WebSocketServer()
+  // server!: Server;
 
   constructor(private chatService: ChatService) {}
 
@@ -27,17 +30,22 @@ export class ChatGateway implements OnGatewayInit {
 
   @SubscribeMessage("message")
   async handleMessage(
-    client: any,
-    {
-      senderId,
-      receiverId,
-      content,
-    }: { senderId: string; receiverId: string; content: string }
-  ): Promise<void> {
+    @MessageBody() body: { senderId: string; receiverId: string; content: string },
+    @ConnectedSocket() client: Socket,
+  ): Promise<string> {
+    const { senderId, receiverId, content } = body;
+    console.log(body);
     // Save the chat message
-    console.log(content);
-    await this.chatService.createChat(senderId, receiverId, content);
+    client.on('message', (message: string) => {
+      console.log(message);
+      client.emit('message', message);
+    });
+    // await this.chatService.createChat(senderId, receiverId, content);
+
+    // // Broadcast the message to all connected clients
+    // this.server.emit("message", { senderId, receiverId, content });
     
+    return content;
   }
 
   @SubscribeMessage("joinChat")
