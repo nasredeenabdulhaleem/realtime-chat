@@ -77,11 +77,13 @@ export class ChatGateway {
   @SubscribeMessage('message')
   handleMessage(
     @MessageBody() message: any,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(message);
-    // this.server.emit('message', message); // Broadcast the message to all connected clients
-    client.emit('message', message); // Emit the message back to the client
+    const { data } = message;
+    console.log(data);
+    this.server.emit('message', message); // Broadcast the message to all connected clients
+    // client.emit('message', message); // Emit the message back to the client
     return message;
   }
 
