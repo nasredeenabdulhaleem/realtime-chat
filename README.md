@@ -1,3 +1,4 @@
+
 # Realtime Chat Application
 
 This is a realtime chat application built with NestJS and TypeScript.
@@ -7,6 +8,30 @@ This is a realtime chat application built with NestJS and TypeScript.
 Run `npm install` to install all dependencies.
 
 ## Running the app
+
+```bash
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
+```
+
+## Test
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
 
 Use `npm run start` to start the application.
 

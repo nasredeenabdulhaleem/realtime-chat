@@ -1,62 +1,96 @@
+// import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+
+// @WebSocketGateway()
+// export class ChatGateway {
+//   @SubscribeMessage('message')
+//   handleMessage(client: any, payload: any): string {
+//     return 'Hello world!';
+//   }
+// }
+
+// import {
+//   SubscribeMessage,
+//   MessageBody,
+//   ConnectedSocket,
+//   WebSocketGateway,
+//   WebSocketServer,
+// } from '@nestjs/websockets';
+// import { Socket } from 'socket.io';
+// import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+// import { Server } from 'socket.io';
+
+// @WebSocketGateway()
+// export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+//   @WebSocketServer()
+//   private server!: Server;
+//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//   handleConnection(client: Socket) {
+//     // Handle connection event
+//   }
+//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//   handleDisconnect(client: Socket) {
+//     // Handle disconnection event
+//   }
+
+//   @SubscribeMessage('message')
+//   handleMessage(
+//     @MessageBody() data: string,
+//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//     @ConnectedSocket() client: Socket,
+//   ) {
+//     // Handle received message
+//     this.server.emit('message', data); // Broadcast the message to all connected clients
+//   }
+// }
+
 import {
+  ConnectedSocket,
+  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
-  OnGatewayInit,
   WebSocketServer,
-  MessageBody,
-  ConnectedSocket,
-} from "@nestjs/websockets";
-import { Server } from "socket.io";
-import { ChatService } from "./chat.service";
-import { Socket } from "socket.io";
+  WsResponse,
+} from '@nestjs/websockets';
+import { Observable, from, map } from 'rxjs';
+import { Server, Socket } from 'socket.io';
+
 // import { wsAuthMiddleware } from './ws-auth.middleware';
 
 // const SECRET = 'secret-key';
 
 @WebSocketGateway({
-  namespace: "chat",
-  cors: { origin: "http://127.0.0.1:5500", credentials: true },
+  cors: {
+    origin: '*',
+  },
 })
-export class ChatGateway implements OnGatewayInit {
-  // @WebSocketServer()
-  // server!: Server;
+export class ChatGateway {
+  @WebSocketServer()
+  server: Server;
 
-  constructor(private chatService: ChatService) {}
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   afterInit(server: Server) {
-    console.log("WebSocket Initialized");
+    console.log('WebSocket Initialized');
     // server.use(wsAuthMiddleware(SECRET));
   }
 
-  @SubscribeMessage("message")
-  async handleMessage(
-    @MessageBody() body: { senderId: string; receiverId: string; content: string },
+  // listen for send_message events
+  @SubscribeMessage('message')
+  handleMessage(
+    @MessageBody() message: any,
     @ConnectedSocket() client: Socket,
-  ): Promise<string> {
-    const { senderId, receiverId, content } = body;
-    console.log(body);
-    // Save the chat message
-    client.on('message', (message: string) => {
-      console.log(message);
-      client.emit('message', message);
-    });
-    // await this.chatService.createChat(senderId, receiverId, content);
-
-    // // Broadcast the message to all connected clients
-    // this.server.emit("message", { senderId, receiverId, content });
-    
-    return content;
+  ) {
+    console.log(message);
+    // this.server.emit('message', message); // Broadcast the message to all connected clients
+    client.emit('message', message); // Emit the message back to the client
+    return message;
   }
 
-  @SubscribeMessage("joinChat")
-  async handleJoinChat(
-    client: any,
-    { senderId, receiverId }: { senderId: string; receiverId: string }
-  ): Promise<void> {
-    // Retrieve the chat messages
-    const chats = await this.chatService.getChats(senderId, receiverId);
-
-    // Emit the chat messages to the client
-    client.emit("chats", chats);
+  @SubscribeMessage('events')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
+    console.log(data);
+    return from([1, 2, 3, 4]).pipe(
+      map((item) => ({ event: 'events', data: item })),
+    );
   }
 }
