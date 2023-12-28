@@ -64,5 +64,19 @@ The application has two services:
 
 This project is licensed under the MIT License.
 ```
+<!-- {
+  "sub": "1234567890",
+  "name": "John Doe",
+  "roles": ["admin"],
+  "iat": 1516239022,
+  "exp": 1616239022,
+  "iss": "your-issuer",
+  "aud": "your-audience"
+} -->
 
-This is a basic README file. You should update it according to your project's needs.
+{
+  chat_id: "user_chat_id",
+  username: "string",
+  role: "string",
+  createdAt: Date
+}

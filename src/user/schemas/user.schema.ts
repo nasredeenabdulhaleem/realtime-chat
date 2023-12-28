@@ -5,11 +5,17 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User {
+  @Prop({ unique: true })
+  chat_id: string;
+
   @Prop()
   username: string;
 
   @Prop()
-  password: string;
+  role: string;
+
+  @Prop({ default: Date.now })
+  createdAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
