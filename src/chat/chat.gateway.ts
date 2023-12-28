@@ -1,58 +1,14 @@
-// import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
-
-// @WebSocketGateway()
-// export class ChatGateway {
-//   @SubscribeMessage('message')
-//   handleMessage(client: any, payload: any): string {
-//     return 'Hello world!';
-//   }
-// }
-
-// import {
-//   SubscribeMessage,
-//   MessageBody,
-//   ConnectedSocket,
-//   WebSocketGateway,
-//   WebSocketServer,
-// } from '@nestjs/websockets';
-// import { Socket } from 'socket.io';
-// import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-// import { Server } from 'socket.io';
-
-// @WebSocketGateway()
-// export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-//   @WebSocketServer()
-//   private server!: Server;
-//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//   handleConnection(client: Socket) {
-//     // Handle connection event
-//   }
-//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//   handleDisconnect(client: Socket) {
-//     // Handle disconnection event
-//   }
-
-//   @SubscribeMessage('message')
-//   handleMessage(
-//     @MessageBody() data: string,
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     @ConnectedSocket() client: Socket,
-//   ) {
-//     // Handle received message
-//     this.server.emit('message', data); // Broadcast the message to all connected clients
-//   }
-// }
-
 import {
-  ConnectedSocket,
+  // ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
   WsResponse,
 } from '@nestjs/websockets';
-import { Observable, from, map } from 'rxjs';
+// import { Observable, from, map } from 'rxjs';
 import { Server, Socket } from 'socket.io';
+import { ChatService } from './chat.service';
 
 // import { wsAuthMiddleware } from './ws-auth.middleware';
 
@@ -67,32 +23,70 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
 
+  constructor(private readonly chatService: ChatService) {}
+  private connectedClients: Map<string, Socket> = new Map();
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   afterInit(server: Server) {
     console.log('WebSocket Initialized');
     // server.use(wsAuthMiddleware(SECRET));
   }
 
-  // listen for send_message events
-  @SubscribeMessage('message')
-  handleMessage(
-    @MessageBody() message: any,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    @ConnectedSocket() client: Socket,
-  ) {
-    const { data } = message;
-    console.log(data);
-    this.server.emit('message', message); // Broadcast the message to all connected clients
-    // client.emit('message', message); // Emit the message back to the client
-    return message;
+  handleConnection(client: Socket) {
+    const userId = client.handshake.query.userId as string;
+    if (userId) {
+      this.connectedClients.set(userId, client);
+      console.log(`User ${userId} connected`);
+    }
   }
 
-  @SubscribeMessage('events')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
-    console.log(data);
-    return from([1, 2, 3, 4]).pipe(
-      map((item) => ({ event: 'events', data: item })),
-    );
+  handleDisconnect(client: Socket) {
+    const userId = this.findUserIdBySocket(client);
+    if (userId) {
+      this.connectedClients.delete(userId);
+      console.log(`User ${userId} disconnected`);
+    }
   }
+
+  private findUserIdBySocket(client: Socket): string | undefined {
+    for (const [userId, socket] of this.connectedClients) {
+      if (socket === client) {
+        return userId;
+      }
+    }
+    return undefined;
+  }
+
+  getAllConnectedClients() {
+    return Array.from(this.connectedClients.keys());
+  }
+
+  // listen for send_message events
+  @SubscribeMessage('message')
+  async handleMessage(
+    @MessageBody() message: any,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // @ConnectedSocket() client: Socket,
+  ): Promise<WsResponse<string>> {
+    const { receiverId, content } = message;
+    const receiverSocket = this.connectedClients.get(receiverId);
+    console.log('message', content);
+    await this.chatService.createChat(message);
+    if (receiverSocket) {
+      // If the receiver is connected, emit the message directly to them
+      receiverSocket.emit('message', content);
+    }
+
+    this.server.emit('message', content); // Broadcast the message to all connected clients
+    return { event: 'message', data: content };
+  }
+
+  // @SubscribeMessage('events')
+  // // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
+  //   console.log(data);
+  //   return from([1, 2, 3, 4]).pipe(
+  //     map((item) => ({ event: 'events', data: item })),
+  //   );
+  // }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
@@ -33,9 +34,9 @@ const jwtSecret = process.env.JWT_SECRET;
   controllers: [],
   providers: [JwtStrategy],
 })
-// export class AppModule {}
-export class AppModule implements NestModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer.apply(JwtMiddleware).forRoutes('*'); // apply the middleware to all routes
-  // }
-}
+export class AppModule {}
+// export class AppModule implements NestModule {
+// configure(consumer: MiddlewareConsumer) {
+//   consumer.apply(JwtMiddleware).forRoutes('*'); // apply the middleware to all routes
+// }
+// }
