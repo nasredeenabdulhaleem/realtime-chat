@@ -8,7 +8,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { NotFoundException } from '@nestjs/common';
 import { UserDTOStub } from './stubs/user.dto.stub';
 import { UsersDTOStub } from './stubs/users.dto.stub';
-import { CreateUsersDto } from './dto/create-users.dto';
+// import { CreateUsersDto } from './dto/create-users.dto';
 import { describe } from 'node:test';
 
 describe('UserService', () => {
