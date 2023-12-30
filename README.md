@@ -45,6 +45,7 @@ The application is divided into two modules:
 
 - AppModule: This is the root module of the application.
 - ChatModule: This module handles all chat-related functionalities.
+- UserModule: This module handles all user-related functionalities.
 
 ## Controllers
 
@@ -52,6 +53,7 @@ The application has two controllers:
 
 - AppController: This controller handles HTTP requests at the root route.
 - ChatController: This controller handles HTTP requests related to chat.
+- UserController: This controller handles HTTP requests related to user.
 
 ## Services
 
@@ -59,6 +61,12 @@ The application has two services:
 
 - AppService: This service contains application-wide business logic.
 - ChatService: This service contains chat-related business logic.
+- UserService: This service contains user-related business logic.
+
+## Authentication
+ 
+The application uses the JWT authentication method,
+
 
 ## License
 
