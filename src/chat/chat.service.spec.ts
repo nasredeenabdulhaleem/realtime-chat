@@ -42,7 +42,7 @@ describe('ChatService', () => {
     // Closing the DB connection allows Jest to exit successfully.
     await mongoConnection.dropDatabase();
     await mongoConnection.close();
-    await mongod.stop();
+    // await mongod.stop();
   });
 
   // afterAll(async (done) => {

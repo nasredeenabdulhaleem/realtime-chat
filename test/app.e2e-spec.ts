@@ -21,4 +21,20 @@ describe('AppController (e2e)', () => {
       .expect(200)
       .expect('Hello World!');
   });
+  it('/users (GET)', () => {
+    return request(app.getHttpServer()).get('/users').expect(200);
+  });
+
+  it('/users (POST)', () => {
+    return request(app.getHttpServer())
+      .post('/users')
+      .send({ name: 'Test User', email: 'test@example.com' })
+      .expect(201);
+  });
+
+  // Add more tests for other endpoints and HTTP methods here...
+
+  afterAll(async () => {
+    await app.close();
+  });
 });

@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUsersDto } from './dto/create-users.dto';
+// import { Types } from 'mongoose';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -30,8 +33,18 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
   it('should create a user', async () => {
-    expect(await controller.addUser({} as any)).toBe('createUser');
-    expect(service.createUser).toHaveBeenCalled();
+    // const testUserId = new Types.ObjectId();
+    const createUserDto: CreateUserDto = {
+      // _id: testUserId,
+      chat_id: 'chat-001',
+      username: 'Vinicius Santos de Pontes',
+      role: 'user',
+      createdAt: new Date(),
+    };
+    await controller.addUser(createUserDto);
+    expect(service.createUser).toHaveBeenCalledWith(createUserDto);
+    // expect(await controller.addUser({} as any)).toBe('createUser');
+    // expect(service.createUser).toHaveBeenCalled();
   });
 
   it('should get all users', async () => {
@@ -44,7 +57,25 @@ describe('UserController', () => {
     expect(service.userExists).toHaveBeenCalled();
   });
   it('should create multiple users', async () => {
-    expect(await controller.addUsers({ users: [] } as any)).toBe('createUsers');
-    expect(service.createUsers).toHaveBeenCalled();
+    const createUsersDto: CreateUsersDto = {
+      users: [
+        {
+          chat_id: 'chat-001',
+          username: 'Vinicius Santos de Pontes',
+          role: 'user',
+          createdAt: new Date(),
+        },
+        {
+          chat_id: 'chat-002',
+          username: 'Santos de Pontes',
+          role: 'admin',
+          createdAt: new Date(),
+        },
+      ],
+    };
+    await controller.addUsers(createUsersDto);
+    expect(service.createUsers).toHaveBeenCalledWith(createUsersDto.users);
+    // expect(await controller.addUsers({ users: [] } as any)).toBe('createUsers');
+    // expect(service.createUsers).toHaveBeenCalled();
   });
 });
