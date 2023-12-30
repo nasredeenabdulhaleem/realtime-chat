@@ -9,11 +9,14 @@ import {
 // import { Observable, from, map } from 'rxjs';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { UseGuards } from '@nestjs/common';
+import { Roles } from 'src/auth/roles.decorator';
 
 // import { wsAuthMiddleware } from './ws-auth.middleware';
 
 // const SECRET = 'secret-key';
-
+@UseGuards(RolesGuard)
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -62,6 +65,7 @@ export class ChatGateway {
   }
 
   // listen for send_message events
+  @Roles('admin')
   @SubscribeMessage('message')
   async handleMessage(
     @MessageBody() message: any,

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { MongoError } from 'mongodb';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,11 +19,22 @@ export class UserService {
    * @throws Throws an error if there is an issue creating the user.
    */
   async createUser(createUserDto: CreateUserDto) {
+    let data;
     try {
       const createdUser = new this.userModel(createUserDto);
-      return await createdUser.save();
+      const savedUser = await createdUser.save();
+      return savedUser.toObject();
     } catch (error) {
-      throw error;
+      if (error instanceof MongoError) {
+        console.error('MongoDB error:', error.message);
+        data = {
+          message: error.message,
+          code: error.code,
+        };
+        return data;
+      }
+
+      return { error: 'an error occured' };
     }
   }
 

@@ -6,9 +6,9 @@ import { ChatModule } from './chat/chat.module';
 import { UserModule } from './user/user.module';
 import * as dotenv from 'dotenv';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './auth/jwt.strategy';
+// import { PassportModule } from '@nestjs/passport';
+// import { JwtModule } from '@nestjs/jwt';
+// import { JwtStrategy } from './auth/jwt.strategy';
 import { JwtMiddleware } from './auth/jwt.middleware';
 // import { RolesGuard } from './auth/roles.guard';
 
@@ -32,11 +32,11 @@ const jwtSecret = process.env.JWT_SECRET;
     // }),
   ],
   controllers: [],
-  providers: [JwtStrategy],
+  providers: [],
 })
-export class AppModule {}
-// export class AppModule implements NestModule {
-// configure(consumer: MiddlewareConsumer) {
-//   consumer.apply(JwtMiddleware).forRoutes('*'); // apply the middleware to all routes
-// }
-// }
+// export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware).forRoutes('*'); // apply the middleware to all routes
+  }
+}

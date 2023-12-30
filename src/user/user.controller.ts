@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { RolesGuard } from '../../src/auth/roles.guard';
+import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateUsersDto } from './dto/create-users.dto';
@@ -14,14 +14,14 @@ export class UserController {
   @Roles('admin')
   @Post()
   addUser(@Body() createUserDto: CreateUserDto) {
-    this.userService.createUser(createUserDto);
+    return this.userService.createUser(createUserDto);
   }
   @Roles('admin')
   @Get()
   getAllUsers() {
     return this.userService.getAllUsers();
   }
-  // @Roles('admin')
+  @Roles('admin')
   @Get(':id/exists')
   async userExists(@Param('id') userId: string): Promise<boolean> {
     return this.userService.userExists(userId);

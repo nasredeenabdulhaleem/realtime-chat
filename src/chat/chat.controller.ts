@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto, FindAllChatDto } from './dto/chat.dto';
 import { ChatGateway } from './chat.gateway';
-import { ConnectedSocket } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
 
+@UseGuards(RolesGuard)
 @Controller('chat')
 export class ChatController {
   constructor(
@@ -13,17 +14,13 @@ export class ChatController {
     private chatGateway: ChatGateway,
   ) {}
 
-  //   @Post()
-  //   async create(@Body() body: CreateChatDto) {
-  //     this.chatGateway.handleMessage(body);
-  //     return this.chatService.createChat(body);
-  //   }
-
+  @Roles('admin')
   @Get('connected-clients')
   getConnectedClients() {
     return this.chatGateway.getAllConnectedClients();
   }
 
+  @Roles('admin')
   @Post()
   async findAll(@Body() body: FindAllChatDto) {
     return this.chatService.getChats(body);
