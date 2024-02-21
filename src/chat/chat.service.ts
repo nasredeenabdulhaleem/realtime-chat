@@ -15,6 +15,18 @@ export class ChatService {
     return createdChat.save();
   }
 
+  // async getChats(body: any): Promise<Chat[]> {
+  //   const { senderId, receiverId } = body;
+  //   return this.chatModel
+  //     .find({
+  //       $or: [
+  //         { senderId: senderId, receiverId: receiverId },
+  //         { senderId: receiverId, receiverId: senderId },
+  //       ],
+  //     })
+  //     .sort('timestamp')
+  //     .exec();
+  // }
   async getChats(body: any): Promise<Chat[]> {
     const { senderId, receiverId } = body;
     return this.chatModel
@@ -24,7 +36,81 @@ export class ChatService {
           { senderId: receiverId, receiverId: senderId },
         ],
       })
+      .populate('senderId receiverId')
       .sort('timestamp')
+      .exec();
+  }
+
+  // async getAllUserChats(userId: string): Promise<Chat[]> {
+  //   return this.chatModel
+  //     .find({
+  //       $or: [{ senderId: userId }],
+  //     })
+  //     .sort('timestamp')
+  //     .exec();
+  // }
+  // async getChat(sender_id, receiver_id): Promise<Chat[]> {
+  //   return this.chatModel
+  //     .find({
+  //       $or: [
+  //         { senderId: sender_id, receiverId: receiver_id },
+  //         // { senderId: receiver_id, receiverId: sender_id },
+  //       ],
+  //     })
+  //     .sort('timestamp')
+  //     .exec();
+  // }
+  async getChat(sender_id: string, receiver_id: string): Promise<Chat[]> {
+    return this.chatModel
+      .find({
+        $or: [
+          { senderId: sender_id, receiverId: receiver_id },
+          { senderId: receiver_id, receiverId: sender_id },
+        ],
+      })
+      .populate('senderId receiverId')
+      .sort('timestamp')
+      .exec();
+  }
+  async newgetChats(sender_id: string, receiver_id: string): Promise<Chat[]> {
+    return this.chatModel
+      .find({
+        $or: [
+          { senderId: sender_id, receiverId: receiver_id },
+          { senderId: receiver_id, receiverId: sender_id },
+        ],
+      })
+      .sort('timestamp')
+      .exec();
+  }
+
+  async getAllUserChats(userId: string): Promise<Chat[]> {
+    return this.chatModel
+      .aggregate([
+        {
+          $match: {
+            $or: [{ senderId: userId }, { receiverId: userId }],
+          },
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+        {
+          $group: {
+            _id: {
+              $cond: [
+                { $eq: ['$senderId', userId] },
+                '$receiverId',
+                '$senderId',
+              ],
+            },
+            doc: { $first: '$$ROOT' },
+          },
+        },
+        {
+          $replaceRoot: { newRoot: '$doc' },
+        },
+      ])
       .exec();
   }
 }

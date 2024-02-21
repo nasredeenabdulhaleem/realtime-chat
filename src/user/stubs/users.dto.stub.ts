@@ -8,12 +8,14 @@ export const UsersDTOStub = (): CreateUsersDto => {
         username: 'Vinicius Santos de Pontes',
         role: 'user',
         createdAt: new Date(),
+        chats: [],
       },
       {
         chat_id: 'chat-003',
         username: 'Vinicius Santos de Pontes',
         role: 'vendor',
         createdAt: new Date(),
+        chats: [],
       },
     ],
   };

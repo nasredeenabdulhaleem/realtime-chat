@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
+import { Chat } from '../../chat/schemas/chat.schema';
 
 export type UserDocument = User & Document;
 
@@ -16,6 +18,9 @@ export class User {
 
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Prop({ type: [{ type: String, ref: 'Chat' }] })
+  chats!: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // import { Injectable, NestMiddleware } from '@nestjs/common';
 // import { Request, Response, NextFunction } from 'express';
 // import * as jwt from 'jsonwebtoken';
@@ -51,11 +52,7 @@ const audience = process.env.JWT_AUDIENCE;
 
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
-  use(
-    req: CustomRequest | Socket,
-    res: Response | undefined,
-    next: NextFunction,
-  ) {
+  use(req: CustomRequest | Socket, res: Response, next: NextFunction) {
     let token: string | undefined;
 
     if (req instanceof Socket) {
@@ -75,11 +72,11 @@ export class JwtMiddleware implements NestMiddleware {
       }
     } else {
       try {
-        const decoded = jwt.verify(token, jwtSecret, {
-          issuer: issuer,
-          audience: audience,
-        });
-        (req as any).user = decoded;
+        const decoded = jwt.verify(token, jwtSecret);
+        // console.log(decoded);
+        (req as CustomRequest).user = decoded;
+        console.log('decoded user', (req as CustomRequest).user);
+        // return req;
       } catch (err) {
         console.error('JWT verification failed', err);
         if (res) {

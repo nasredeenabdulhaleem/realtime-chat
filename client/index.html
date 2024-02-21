@@ -43,7 +43,7 @@
     <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script>
     <script>
       const userId = 'chat001'; 
-      const socket = io('http://localhost:3000', { query: { userId } });
+      const socket = io('ws://127.0.0.1:3000', { query: { userId } });
       socket.on('connect', function() {
         console.log('Connected');
 

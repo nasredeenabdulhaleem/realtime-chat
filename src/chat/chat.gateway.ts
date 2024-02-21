@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   // ConnectedSocket,
   MessageBody,
@@ -16,8 +17,9 @@ import { Roles } from 'src/auth/roles.decorator';
 // import { wsAuthMiddleware } from './ws-auth.middleware';
 
 // const SECRET = 'secret-key';
-@UseGuards(RolesGuard)
+// @UseGuards(RolesGuard)
 @WebSocketGateway({
+  // port: 8080,
   cors: {
     origin: '*',
   },
@@ -32,6 +34,9 @@ export class ChatGateway {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   afterInit(server: Server) {
     console.log('WebSocket Initialized');
+    // console.log(
+    //   // `WebSocket Server is running on ws://localhost:8080${server.path()}`,
+    // );
     // server.use(wsAuthMiddleware(SECRET));
   }
 
@@ -65,7 +70,7 @@ export class ChatGateway {
   }
 
   // listen for send_message events
-  @Roles('admin')
+  // @Roles('admin')
   @SubscribeMessage('message')
   async handleMessage(
     @MessageBody() message: any,
@@ -80,7 +85,7 @@ export class ChatGateway {
       // If the receiver is connected, emit the message directly to them
       receiverSocket.emit('message', content);
     }
-
+    this.server.emit('message', { msg: 'hello everybody' });
     this.server.emit('message', content); // Broadcast the message to all connected clients
     return { event: 'message', data: content };
   }

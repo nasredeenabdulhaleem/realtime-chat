@@ -45,10 +45,12 @@ export class RolesGuard implements CanActivate {
 
     if (httpContext) {
       user = httpContext.user;
-    } else if (wsContext) {
+      console.log('user context http', httpContext.user);
+    } else {
+      console.log('user context ws', wsContext.user);
       user = wsContext.user;
     }
-
+    console.log('attached user', user);
     return requiredRoles.some((role) => user?.roles?.includes(role));
   }
 }

@@ -19,7 +19,7 @@ export class UserService {
    * @throws Throws an error if there is an issue creating the user.
    */
   async createUser(createUserDto: CreateUserDto) {
-    let data;
+    let data: { message: string; code: string | number };
     try {
       const createdUser = new this.userModel(createUserDto);
       const savedUser = await createdUser.save();
@@ -63,15 +63,26 @@ export class UserService {
   //     throw new NotFoundException(`Invalid user ID: ${id}`);
   //   }
   // }
-  async getUserById(id: string): Promise<UserDocument> {
+  // async getUserById(id: string): Promise<UserDocument> {
+  //   try {
+  //     const user = await this.userModel.findById(id).exec();
+  //     if (!user) {
+  //       throw new NotFoundException(`User with ID ${id} not found`);
+  //     }
+  //     return user; // Convert Mongoose document to plain JavaScript object
+  //   } catch (error) {
+  //     throw new NotFoundException(`Invalid user ID: ${id}`);
+  //   }
+  // }
+  async getUserByChatId(chat_id: string): Promise<UserDocument> {
     try {
-      const user = await this.userModel.findById(id).exec();
+      const user = await this.userModel.findOne({ chat_id });
       if (!user) {
-        throw new NotFoundException(`User with ID ${id} not found`);
+        throw new NotFoundException(`User with ID ${chat_id} not found`);
       }
-      return user; // Convert Mongoose document to plain JavaScript object
+      return user;
     } catch (error) {
-      throw new NotFoundException(`Invalid user ID: ${id}`);
+      throw new NotFoundException(`Invalid user ID: ${chat_id}`);
     }
   }
 

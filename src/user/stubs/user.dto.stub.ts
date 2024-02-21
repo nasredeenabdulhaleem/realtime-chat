@@ -6,5 +6,6 @@ export const UserDTOStub = (): CreateUserDto => {
     username: 'Vinicius Santos de Pontes',
     role: 'user',
     createdAt: new Date(),
+    chats: [],
   };
 };

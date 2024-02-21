@@ -4,12 +4,14 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 // import { AppService } from './app.service';
 import { ChatModule } from './chat/chat.module';
 import { UserModule } from './user/user.module';
+import { AppController } from './app.controller';
 import * as dotenv from 'dotenv';
 import { MongooseModule } from '@nestjs/mongoose';
 // import { PassportModule } from '@nestjs/passport';
 // import { JwtModule } from '@nestjs/jwt';
 // import { JwtStrategy } from './auth/jwt.strategy';
 import { JwtMiddleware } from './auth/jwt.middleware';
+import { AppService } from './app.service';
 // import { RolesGuard } from './auth/roles.guard';
 
 dotenv.config();
@@ -31,8 +33,8 @@ const jwtSecret = process.env.JWT_SECRET;
     //   signOptions: { expiresIn: '60s' },
     // }),
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
 // export class AppModule {}
 export class AppModule implements NestModule {
