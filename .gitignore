@@ -29,7 +29,7 @@
 # TypeScript
 *.tsbuildinfo
 # compiled output
-/dist
+/src
 /node_modules
 
 # Logs
